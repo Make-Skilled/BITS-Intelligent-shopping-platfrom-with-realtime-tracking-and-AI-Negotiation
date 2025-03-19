@@ -1,3 +1,4 @@
+import random
 from flask import Flask,request,render_template,session,redirect, flash
 from pymongo import MongoClient
 from bson import ObjectId
@@ -8,6 +9,8 @@ db=cluster['bvc']
 customers=db['customers']
 uses=db['uses']
 products=db['products']
+website1=db['products1']
+website2=db['products1']
 carts=db['cart']
 orders1=db['orders']
 
@@ -257,6 +260,32 @@ def addproduct():
         'productname':productname,
         'productcategory':productcategory,
         'productprice':productprice,
+        'negotiation_price':negotiation_price,
+        'productstock':productstock,
+        'productdescription':productdescription,
+        'productcolor':productcolor,
+        'productrating':productrating,
+        'imageurl':imageurl,
+        'sizes': productsizes,  # Add sizes to the product document
+        'owner':session['username']
+    })
+    website1.insert_one({
+        'productname':productname,
+        'productcategory':productcategory,
+        'productprice': productprice + str(random.randint(30, 100)),
+        'negotiation_price':negotiation_price,
+        'productstock':productstock,
+        'productdescription':productdescription,
+        'productcolor':productcolor,
+        'productrating':productrating,
+        'imageurl':imageurl,
+        'sizes': productsizes,  # Add sizes to the product document
+        'owner':session['username']
+    })
+    website2.insert_one({
+        'productname':productname,
+        'productcategory':productcategory,
+        'productprice': productprice + str(random.randint(30, 100)),
         'negotiation_price':negotiation_price,
         'productstock':productstock,
         'productdescription':productdescription,
@@ -640,7 +669,7 @@ def negotiate_price(cart_id):
                 flash('Price updated! You saved ₹{:.2f} ({:.1f}% discount)'.format(
                     savings, discount_percentage), 'success')
             elif negotiated_price < min_allowed_price:
-                flash('Price too low.', 'error')
+                flash('Seller is not intrested this price.', 'error')
                 #  Minimum allowed price is ₹{:.2f}'.format(min_allowed_price)
             else:
                 flash('Negotiated price must be less than original price', 'error')
